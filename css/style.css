@@ -73,7 +73,7 @@ img {
     max-width: 100%;
 	border:none;
 	margin:0;
-	padding;0;
+	padding:0;
 }
 .float-right{
 	float:right;
@@ -301,8 +301,6 @@ img,img:hover,img:focus{
 		.social-icon ul li{
 			display:inline;	
 			float:right;
-			
-			
 			text-align:center;
 			}
 		.social-icon ul li a .fa{
@@ -1088,12 +1086,9 @@ span.goalAmount {
 	margin-bottom:15px;
 }
 .team-img{
-	
 	position:relative;
 }
-.team-img:first-child{
-	
-}
+
 .overlay{
 	 border: 2px solid #fff;
     height: 93%;
