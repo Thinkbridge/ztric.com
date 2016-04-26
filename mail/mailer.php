@@ -1,54 +1,61 @@
-<?php
-    // My modifications to mailer script from:
-    // http://blog.teamtreehouse.com/create-ajax-contact-form
-    // Added input sanitizing to prevent injection
-
-    // Only process POST reqeusts.
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Get the form fields and remove whitespace.
-        $name = strip_tags(trim($_POST["name"]));
-				$name = str_replace(array("\r","\n"),array(" "," "),$name);
-        $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
-        $message = trim($_POST["message"]);
-
-        // Check that data was sent to the mailer.
-        if ( empty($name) OR empty($message) OR !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            // Set a 400 (bad request) response code and exit.
-            http_response_code(400);
-            echo "Oops! There was a problem with your submission. Please complete the form and try again.";
-            exit;
-        }
-
-        // Set the recipient email address.
-        // FIXME: Update this to your desired email address.
-        $recipient = "info@ztric.com";
-
-        // Set the email subject.
-        $subject = "New contact from $name";
-
-        // Build the email content.
-        $email_content = "Name: $name\n";
-        $email_content .= "Email: $email\n\n";
-        $email_content .= "Message:\n$message\n";
-
-        // Build the email headers.
-        $email_headers = "From: $name <$recipient>";
-
-        // Send the email.
-        if (mail($recipient, $subject, $email_content, $email_headers)) {
-            // Set a 200 (okay) response code.
-            http_response_code(200);
-            echo "Thank You! Your message has been sent.";
-        } else {
-            // Set a 500 (internal server error) response code.
-            http_response_code(500);
-            echo "Oops! Something went wrong and we couldn't send your message.";
-        }
-
+<?php 
+    $url_path = realpath(dirname(__FILE__));
+    if (strpos($url_path,'\php')) {
+      $replaceStr = '\php';
     } else {
-        // Not a POST request, set a 403 (forbidden) response code.
-        http_response_code(403);
-        echo "There was a problem with your submission, please try again.";
+      $replaceStr = '/php';
     }
-
+    $path = str_replace($replaceStr, "", $url_path);
+    require_once($path .'/sendgrid-php/sendgrid-php.php');
+    $sendgrid = new SendGrid('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');
+    $email    = new SendGrid\Email();    
+ 
+    $mail = array(
+        "name" => htmlspecialchars($_POST['cf_name']),
+        "email" => htmlspecialchars($_POST['cf_email']),
+        "message" => htmlspecialchars($_POST['cf_message'])
+    );
+    $sender_email = $mail['email'];
+    $email->addTo("info@ztric.com")
+          ->setFrom($sender_email)
+          ->setSubject("Zen Office - New Invitaion Received!")
+          ->setHtml('<body>
+                        <div style="display: table;margin: 0 auto;background-color:#fff;border:1px solid #e4e4e4;width:550px;" align="center"> 
+                          
+                          <table bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" width="100%" > 
+                            <tr align="center" valign="top" bgcolor="#26a7e9">
+                              <th style="background-color: #26a7e9;font-weight: normal;font-size: 22px;padding:15px 20px;color:#fff;font-family:arial;" width="50%" colspan="2">New Customer Invitation</th>
+                            </tr>
+                            <tr align="left" valign="top" style="background-color:#f7f7f7;">
+                              <td style="padding-left:10px;"><p>Name</p></td>
+                              <td><p>%name%</p></td>
+                            </tr>
+                            <tr align="left" valign="top" style="background-color:#f7f7f7;">
+                                <td style="padding-left:10px;"><p>email</p></td>
+                              <td><p>%email%</p></td>
+                            </tr>
+                            <tr align="left" valign="top" style="background-color:#f7f7f7;">
+                              <td style="padding-left:10px;"><p>Subject</p></td>
+                              <td><p>%subject%</p></td>
+                            </tr>
+                            <tr align="left" valign="top" style="background-color:#f7f7f7;">
+                                <td style="padding-left:10px;"><p>Message</p></td>
+                              <td><p>%msg%</p></td>
+                            </tr>
+                          </table>
+                        </div>
+                    </body>')
+            ->addSubstitution("%name%", array($mail['name']))
+            ->addSubstitution("%email%", array($mail['email']))
+            ->addSubstitution("%subject%", array($mail['subject']))
+            ->addSubstitution("%msg%", array($mail['message']));
+    try {
+        $response=$sendgrid->send($email);
+        echo json_encode($response);
+    } catch(\SendGrid\Exception $e) {
+        echo $e->getCode();
+        foreach($e->getErrors() as $er) {
+            echo $er;
+        }
+    }
 ?>
