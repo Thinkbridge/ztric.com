@@ -11,9 +11,9 @@
     $email    = new SendGrid\Email();    
  
     $mail = array(
-        "name" => htmlspecialchars($_POST['cf_name']),
-        "email" => htmlspecialchars($_POST['cf_email']),
-        "message" => htmlspecialchars($_POST['cf_message'])
+        "name" => htmlspecialchars($_POST['name']),
+        "email" => htmlspecialchars($_POST['email']),
+        "message" => htmlspecialchars($_POST['message'])
     );
     $sender_email = $mail['email'];
     $email->addTo("info@ztric.com")
@@ -35,10 +35,6 @@
                               <td><p>%email%</p></td>
                             </tr>
                             <tr align="left" valign="top" style="background-color:#f7f7f7;">
-                              <td style="padding-left:10px;"><p>Subject</p></td>
-                              <td><p>%subject%</p></td>
-                            </tr>
-                            <tr align="left" valign="top" style="background-color:#f7f7f7;">
                                 <td style="padding-left:10px;"><p>Message</p></td>
                               <td><p>%msg%</p></td>
                             </tr>
@@ -47,7 +43,6 @@
                     </body>')
             ->addSubstitution("%name%", array($mail['name']))
             ->addSubstitution("%email%", array($mail['email']))
-            ->addSubstitution("%subject%", array($mail['subject']))
             ->addSubstitution("%msg%", array($mail['message']));
     try {
         $response=$sendgrid->send($email);
