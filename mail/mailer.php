@@ -1,9 +1,9 @@
 <?php 
     $url_path = realpath(dirname(__FILE__));
-    if (strpos($url_path,'\php')) {
-      $replaceStr = '\php';
+    if (strpos($url_path,'\mail')) {
+      $replaceStr = '\mail';
     } else {
-      $replaceStr = '/php';
+      $replaceStr = '/mail';
     }
     $path = str_replace($replaceStr, "", $url_path);
     require_once($path .'/sendgrid-php/sendgrid-php.php');
