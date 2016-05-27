@@ -1,0 +1,27 @@
+/*****************************************************
+============== For adding custom style ===============
+******************************************************/
+table,th, td {
+	border: 1px solid silver;
+    border-collapse: collapse;
+}
+th, td {	
+    padding: 10px;
+    font-size: medium;
+}
+th {
+	text-align: center;
+	color: white;
+	font-size: large !important;
+}
+
+.background-custom {
+		background-color: #2F6513;
+}
+
+.text-custom {
+	width: 80%;
+    margin-top: 10px;
+    font-size: medium;
+    text-align: center;
+}
